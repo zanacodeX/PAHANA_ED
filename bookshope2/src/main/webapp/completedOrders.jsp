@@ -71,10 +71,18 @@
                         <button type="submit" class="btn-print">Print Bill</button>
                     </form>
                 </td>
+                
             </tr>
+            
         <% } %>
         </tbody>
+        
     </table>
+    <div class="back-button">
+    <a href="customerDashboard.jsp">
+        <button type="button">Back to Dashboard</button>
+    </a>
+</div>
     <% } else { %>
         <p>No completed orders found.</p>
     <% } %>

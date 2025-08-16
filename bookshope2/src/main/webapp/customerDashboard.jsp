@@ -127,8 +127,13 @@
         <% if (isLoggedIn) { %>
             | <a href="LogoutServlet">Logout</a>
         <% } else { %>
-            | <a href="login.jsp">Login</a>
-            <a href="register.jsp">Register</a>
+            | <a href="landing.jsp" onclick="return confirmLogout();">Logout</a>
+            <script>
+    function confirmLogout() {
+        return confirm("Are you sure you want to log out?");
+    }
+</script>
+            
         <% } %>
     </div>
 </div>
