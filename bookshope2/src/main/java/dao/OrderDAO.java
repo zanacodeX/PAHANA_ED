@@ -12,24 +12,27 @@ import model.DBConnection;
 public class OrderDAO {
 
     // Place an order
-    public void placeOrder(Order order) throws Exception {
-        String sql = "INSERT INTO orders (customer_id, book_id, book_name, author, unit_price, quantity, total, order_status, payment_status) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, order.getCustomerId());
-            stmt.setInt(2, order.getBookId());
-            stmt.setString(3, order.getBookName());
-            stmt.setString(4, order.getAuthor());
-            stmt.setDouble(5, order.getUnitPrice());
-            stmt.setInt(6, order.getQuantity());
-            stmt.setDouble(7, order.getTotal());
-            stmt.setString(8, "Pending");
-            stmt.setString(9, "Pending");
+	// Place an order
+	public boolean placeOrder(Order order) throws Exception {
+	    String sql = "INSERT INTO orders (customer_id, book_id, book_name, author, unit_price, quantity, total, order_status, payment_status) " +
+	                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	         
+	        stmt.setInt(1, order.getCustomerId());
+	        stmt.setInt(2, order.getBookId());
+	        stmt.setString(3, order.getBookName());
+	        stmt.setString(4, order.getAuthor());
+	        stmt.setDouble(5, order.getUnitPrice());
+	        stmt.setInt(6, order.getQuantity());
+	        stmt.setDouble(7, order.getTotal());
+	        stmt.setString(8, "Pending");   // default order_status
+	        stmt.setString(9, "Pending");   // default payment_status
 
-            stmt.executeUpdate();
-        }
-    }
+	        int rows = stmt.executeUpdate();  // returns number of rows affected
+	        return rows > 0;  // true if inserted successfully
+	    }
+	}
     
     //compketed
     
