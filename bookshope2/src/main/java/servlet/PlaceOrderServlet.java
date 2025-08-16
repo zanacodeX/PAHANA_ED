@@ -1,6 +1,7 @@
 package servlet;
 
-import dao.OrderDAO;
+import controller.OrderController;
+import dto.Customer;
 import dto.Order;
 
 import javax.servlet.ServletException;
@@ -8,11 +9,21 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 
-//@WebServlet("/placeOrder")  // ✅ Very Important
+//@WebServlet("/placeOrder")  // Servlet mapping
 public class PlaceOrderServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private OrderController orderController;
+
+    @Override
+    public void init() throws ServletException {
+        orderController = new OrderController();
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         try {
             HttpSession session = request.getSession(false);
             if (session == null || session.getAttribute("customer") == null) {
@@ -20,8 +31,8 @@ public class PlaceOrderServlet extends HttpServlet {
                 return;
             }
 
-            // ✅ Get Customer ID from Session
-            dto.Customer customer = (dto.Customer) session.getAttribute("customer");
+            // ✅ Get Customer from Session
+            Customer customer = (Customer) session.getAttribute("customer");
             int customerId = customer.getCustomerId();
 
             // ✅ Get Book Details from Form
@@ -32,7 +43,7 @@ public class PlaceOrderServlet extends HttpServlet {
             int quantity = Integer.parseInt(request.getParameter("quantity"));
             double total = unitPrice * quantity;
 
-            // ✅ Set Order Details
+            // ✅ Set Order DTO
             Order order = new Order();
             order.setCustomerId(customerId);
             order.setBookId(bookId);
@@ -42,12 +53,16 @@ public class PlaceOrderServlet extends HttpServlet {
             order.setQuantity(quantity);
             order.setTotal(total);
 
-            // ✅ Save to DB
-            OrderDAO dao = new OrderDAO();
-            dao.placeOrder(order);
+            // ✅ Call Controller
+            boolean success = orderController.placeOrder(order);
 
-            request.setAttribute("message", "Order placed successfully!");
-            request.getRequestDispatcher("customerDashboard.jsp").forward(request, response);
+            if (success) {
+                request.setAttribute("message", "Order placed successfully!");
+                request.getRequestDispatcher("customerDashboard.jsp").forward(request, response);
+            } else {
+                request.setAttribute("error", "Order failed. Please try again.");
+                request.getRequestDispatcher("placeOrder.jsp").forward(request, response);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
