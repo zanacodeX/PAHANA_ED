@@ -1,8 +1,6 @@
 package servlet;
 
-import dao.CustomerDAO;
-import dao.OrderDAO;
-import dto.Customer;
+import controller.OrderController;
 import dto.Order;
 import dto.User;
 
@@ -12,12 +10,17 @@ import java.io.IOException;
 import java.util.List;
 
 public class CustomerPendingOrderServlet extends HttpServlet {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private static final long serialVersionUID = 1L;
+    private OrderController orderController;
+
+    @Override
+    public void init() {
+        orderController = new OrderController();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             HttpSession session = request.getSession(false);
             if (session == null || session.getAttribute("user") == null) {
@@ -26,11 +29,7 @@ public class CustomerPendingOrderServlet extends HttpServlet {
             }
 
             User user = (User) session.getAttribute("user");
-            CustomerDAO customerDAO = new CustomerDAO();
-            int customerId = customerDAO.getCustomerIdByUserId(user.getUserId());
-
-            OrderDAO orderDAO = new OrderDAO();
-            List<Order> pendingOrders = orderDAO.getPendingOrdersByCustomerId(customerId);
+            List<Order> pendingOrders = orderController.getPendingOrdersForUser(user);
 
             request.setAttribute("pendingOrders", pendingOrders);
             RequestDispatcher dispatcher = request.getRequestDispatcher("/customerOrderStatus.jsp");

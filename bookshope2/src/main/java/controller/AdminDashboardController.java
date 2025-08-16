@@ -8,6 +8,6 @@ public class AdminDashboardController {
     private AdminDashboardDAO dashboardDAO = new AdminDashboardDAO();
 
     public AdminSummary getDashboardSummary() throws Exception {
-        return dashboardDAO.getDashboardSummary(); //comme
+        return dashboardDAO.getDashboardSummary(); //com
     }
 }

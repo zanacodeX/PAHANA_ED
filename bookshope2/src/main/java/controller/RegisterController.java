@@ -13,7 +13,7 @@ public class RegisterController {
 
         public RegisterResult(boolean success, String message) {
             this.success = success;
-            this.message = message;
+            this.message = message;//njnnkkk
         }
 
         public boolean isSuccess() {
