@@ -38,7 +38,7 @@
 <nav>
     <a href="#dashboard">Dashboard</a>
     <a href="manageBooks.jsp">Manage Books</a>
-    <a href="manageBookings.jsp">Manage Bookings</a>
+    <a href="manageBookings.jsp">Manage Booking</a>
     <a href="BillServlet">Bills</a>
     <a href="manageCustomers.jsp">Customer Manager</a>
     <a href="AllOrderData">All Orders</a>
