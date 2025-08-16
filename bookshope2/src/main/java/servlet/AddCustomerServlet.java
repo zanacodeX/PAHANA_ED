@@ -25,7 +25,7 @@ public class AddCustomerServlet extends HttpServlet {
         String accNum = req.getParameter("accountNumber");
         String name = req.getParameter("name");
         String address = req.getParameter("address");
-        String phone = req.getParameter("phone");
+        String phone = req.getParameter("phone");//njn
 
         RegisterResult result = registerController.registerCustomer(email, password, accNum, name, address, phone);
 
