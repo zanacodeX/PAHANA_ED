@@ -32,7 +32,12 @@
 
 <header>
     <h1>Welcome Admin</h1>
-    <p><a href="log.jsp" style="color: white; text-decoration: underline;">Logout</a></p>
+    <p><a href="landing.jsp" style="color: white; text-decoration: underline;"onclick="return confirmLogout();">Logout</a></p>
+    <script>
+    function confirmLogout() {
+        return confirm("Are you sure you want to log out?");
+    }
+</script>
 </header>
 
 <nav>
@@ -42,6 +47,7 @@
     <a href="BillServlet">Bills</a>
     <a href="manageCustomers.jsp">Customer Manager</a>
     <a href="AllOrderData">All Orders</a>
+    <a href="addCustomer.jsp">Add customer</a>
 </nav>
 
 <section id="dashboard">
@@ -76,6 +82,10 @@
         </div>
     </div>
 </section>
-
+<script>
+    function confirmLogout() {
+        return confirm("Are you sure you want to log out?");
+    }
+</script>
 </body>
 </html>

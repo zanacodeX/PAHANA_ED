@@ -30,7 +30,8 @@ public class RegisterServlet extends HttpServlet {
         RegisterResult result = registerController.registerCustomer(email, password, accNum, name, address, phone);
 
         if (result.isSuccess()) {
-            res.sendRedirect("login.jsp");
+        	
+           res.sendRedirect("login.jsp");
         } else {
             req.setAttribute("errorMessage", result.getMessage());
             req.getRequestDispatcher("error.jsp").forward(req, res);

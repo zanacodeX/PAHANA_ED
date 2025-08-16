@@ -113,6 +113,7 @@
     
 
     <form action="register" method="post">
+     
     <a href="landing.jsp" class="close-btn" title="Go to Home">✖</a>
         <h2>Register</h2>
 
