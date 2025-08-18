@@ -6,7 +6,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Manage Bookings</title>
+    <title>Manage Orders</title>
     <style>
         body {
             font-family: "Segoe UI", Arial, sans-serif;
@@ -109,7 +109,7 @@
     <form action="adminDashboard.jsp" method="get" style="display:inline;">
         <button type="submit" class="back-btn">← Back</button>
     </form>
-    <h2>Manage Bookings</h2>
+    <h2>Manage Orders</h2>
 </header>
 
 <form method="get" action="manageBookings.jsp">

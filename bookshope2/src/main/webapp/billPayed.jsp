@@ -7,7 +7,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Bills</title>
+    <title>Paid Bills</title>
     <style>
         body {
             font-family: "Segoe UI", Arial, sans-serif;
@@ -86,7 +86,7 @@
     <form action="adminDashboard.jsp" method="get" style="display:inline;">
         <button type="submit" class="back-btn">← Back</button>
     </form>
-    <h2>Bills</h2>
+    <h2>Paid Bills</h2>
 </header>
 
 <div class="container">

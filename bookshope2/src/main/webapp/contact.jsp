@@ -110,7 +110,7 @@
         padding: 15px;
         text-align: center;
         position: sticky;
-        /* ensure text is visible */
+        
     }
    
 

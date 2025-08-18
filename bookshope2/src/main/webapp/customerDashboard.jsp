@@ -158,7 +158,7 @@
 <div class="navbar">
     <div>
         <a href="customerDashboard.jsp">Dashboard</a>
-        <a href="customerOrderStatus"> Orders Status</a>
+        <a href="customerOrderStatus"> Order Status</a>
         <a href="completedOrders">Completed Orders</a>
     </div>
     <div>

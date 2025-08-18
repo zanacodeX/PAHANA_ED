@@ -31,7 +31,7 @@
 <body>
 
 <header>
-    <h1>Welcome Admin</h1>
+    <h1>WELLCOME ADMIN</h1>
     <p><a href="landing.jsp" style="color: white; text-decoration: underline;"onclick="return confirmLogout();">Logout</a></p>
     <script>
     function confirmLogout() {
@@ -43,11 +43,11 @@
 <nav>
     <a href="#dashboard">Dashboard</a>
     <a href="manageBooks.jsp">Manage Books</a>
-    <a href="manageBookings.jsp">Manage Booking</a>
-    <a href="BillServlet">Bills</a>
-    <a href="manageCustomers.jsp">Customer Manager</a>
+    <a href="manageBookings.jsp">Manage Orders</a>
+    <a href="BillServlet">Paid Bills</a>
+    <a href="manageCustomers.jsp">Manage Customer</a>
     <a href="AllOrderData">All Orders</a>
-    <a href="addCustomer.jsp">Add customer</a>
+    <a href="addCustomer.jsp">Add Customer</a>
 </nav>
 
 <section id="dashboard">
