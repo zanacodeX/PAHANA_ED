@@ -8,9 +8,24 @@
     BookDAO dao = new BookDAO();
     List<Book> books = dao.getAllBooks();
 
-    Customer customer = (Customer) request.getAttribute("customer");
+   
     String userEmail = (String) session.getAttribute("userEmail");
     boolean isLoggedIn = (userEmail != null);
+%>
+
+<%
+    // First check if customer is in request (from servlet)
+    Customer customer = (Customer) request.getAttribute("customer");
+
+    // If not found in request, try from session
+    if (customer == null) {
+        customer = (Customer) session.getAttribute("customer");
+    }
+
+    // If found in request (first time load), store it in session for later
+    if (request.getAttribute("customer") != null) {
+        session.setAttribute("customer", request.getAttribute("customer"));
+    }
 %>
 
 <!DOCTYPE html>
@@ -151,6 +166,18 @@
     <% } else { %>
         <p>No customer data available.</p>
     <% } %>
+    
+    
+    
+    <script>
+    // Reload when page is restored from back/forward navigation
+    window.addEventListener("pageshow", function(event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+</script>
+
 </div>
 
 <!-- BOOK LISTING -->
