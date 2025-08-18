@@ -85,6 +85,8 @@
         font-weight: bold;
         transition: background-color 0.3s ease;
     }
+    
+     
 
     input[type="submit"]:hover {
         background-color: #45a049;
@@ -104,6 +106,26 @@
 
     .login-link a:hover {
         text-decoration: underline;
+    }
+    .back-btn-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .back-btn-container button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.3s ease;
+    }
+
+    .back-btn-container button:hover {
+        background-color: #45a049;
     }
 </style>
 </head>
@@ -138,10 +160,10 @@
         Phone:
         <input type="text" name="phone">
 
-        <input type="submit" value="add">
+        <input type="submit" value="ADD NEW CUSTOMER">
 
         <div class="back-button">
-    <a href="adminDashboard.jsp">
+    <a href="adminDashboard.jsp" class="back-btn-container">
         <button type="button">Back to Dashboard</button>
     </a>
 </div>
