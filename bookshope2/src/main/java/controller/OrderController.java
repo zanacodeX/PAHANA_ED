@@ -17,9 +17,7 @@ public class OrderController {
         this.orderDAO = new OrderDAO();//sscsfsc
     }
 
-    /**
-     * Place an order by passing an Order DTO.
-     */
+    
     public boolean placeOrder(Order order) throws Exception {
         return orderDAO.placeOrder(order);
     }

@@ -61,7 +61,7 @@ public class BookController {
     // Update Book
     public boolean updateBook(Book book) {
         try {
-            return bookDAO.updateBook(book);  // updateBook in DAO should return boolean
+            return bookDAO.updateBook(book);  
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -107,5 +107,5 @@ public class BookController {
         }
     }
 
-    // Optionally, you can add more methods like updateBook, deleteBook, getAllBooks here
+   
 }

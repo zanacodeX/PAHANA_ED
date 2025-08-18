@@ -25,6 +25,7 @@ public class LoginController {
     }
 
     // Inner DTO to hold login result
+    //encapsulation
     public static class LoginResult {
         private final User user;
         private final Customer customer;
