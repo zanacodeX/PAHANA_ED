@@ -34,7 +34,7 @@ public class CustomerManagementServlet extends HttpServlet {
                 return;
 
             } else if ("edit".equalsIgnoreCase(action) && idParam != null) {
-                // Redirect to edit page (implement editCustomer.jsp separately)
+                // Redirect to edit page 
                 response.sendRedirect("editCustomer.jsp?id=" + idParam);
                 return;
             }

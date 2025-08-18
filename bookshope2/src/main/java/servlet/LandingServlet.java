@@ -24,7 +24,7 @@ public class LandingServlet extends HttpServlet {
             List<Book> books;
 
             if (category != null && !category.trim().isEmpty()) {
-                books = bookDAO.getBooksByCategory(category); // You must implement this method in BookDAO
+                books = bookDAO.getBooksByCategory(category); 
             } else {
                 books = bookDAO.getAllBooks();
             }

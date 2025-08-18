@@ -46,7 +46,7 @@ public class Order {
 		this.status = status;
 	}
 	
-    // Getters and Setters...
+    
 
 
     // Getters and setters

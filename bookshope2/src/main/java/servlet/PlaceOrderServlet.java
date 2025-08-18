@@ -31,11 +31,11 @@ public class PlaceOrderServlet extends HttpServlet {
                 return;
             }
 
-            // ✅ Get Customer from Session
+            //  Get Customer from Session
             Customer customer = (Customer) session.getAttribute("customer");
             int customerId = customer.getCustomerId();
 
-            // ✅ Get Book Details from Form
+            //  Get Book Details from Form
             int bookId = Integer.parseInt(request.getParameter("book_id"));
             String bookName = request.getParameter("book_name");
             String author = request.getParameter("author");
@@ -43,7 +43,7 @@ public class PlaceOrderServlet extends HttpServlet {
             int quantity = Integer.parseInt(request.getParameter("quantity"));
             double total = unitPrice * quantity;
 
-            // ✅ Set Order DTO
+            //  Set Order DTO
             Order order = new Order();
             order.setCustomerId(customerId);
             order.setBookId(bookId);
@@ -53,7 +53,7 @@ public class PlaceOrderServlet extends HttpServlet {
             order.setQuantity(quantity);
             order.setTotal(total);
 
-            // ✅ Call Controller
+            //  Call Controller
             boolean success = orderController.placeOrder(order);
 
             if (success) {

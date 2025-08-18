@@ -1,7 +1,7 @@
 package dto;
 
 public class AdminSummary {
-    private double totalEarnings;  // changed from BigDecimal to double
+    private double totalEarnings;  
     private int pendingOrders;
     private int confirmedOrders;
     private int completedOrders;

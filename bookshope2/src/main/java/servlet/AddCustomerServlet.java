@@ -14,7 +14,7 @@ public class AddCustomerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        // If user tries GET, just show registration page
+       
         req.getRequestDispatcher("addCustomer.jsp").forward(req, res);
     }
 

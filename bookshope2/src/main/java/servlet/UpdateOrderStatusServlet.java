@@ -63,8 +63,8 @@ public class UpdateOrderStatusServlet extends HttpServlet {
     }
 
     private void sendEmail(String toEmail, String subject, String body) throws MessagingException {
-        final String fromEmail = "pahanabookshope@gmail.com"; // Replace with your email
-        final String password = "ilzf vcua zrys tbor"; // Replace with your email password or app password
+        final String fromEmail = "pahanabookshope@gmail.com"; //  your email
+        final String password = "ilzf vcua zrys tbor"; //  your email password or app password
 
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com"); // SMTP Host for Gmail

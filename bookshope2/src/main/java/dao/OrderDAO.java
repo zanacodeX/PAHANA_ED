@@ -84,7 +84,7 @@ public class OrderDAO {
                 order.setTotal(rs.getDouble("total"));
                 order.setOrderStatus(rs.getString("order_status"));
                 order.setPaymentStatus(rs.getString("payment_status"));
-                // No customer name/email because we are not joining other tables
+               
                 orders.add(order);
             }
         }
@@ -114,7 +114,7 @@ public class OrderDAO {
                 order.setTotal(rs.getDouble("total"));
                 order.setOrderStatus(rs.getString("order_status"));
                 order.setPaymentStatus(rs.getString("payment_status"));
-                // No customer name/email because we are not joining other tables
+                
                 orders.add(order);
             }
         }

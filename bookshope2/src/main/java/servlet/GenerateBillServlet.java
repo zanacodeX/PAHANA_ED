@@ -162,7 +162,7 @@ public class GenerateBillServlet extends HttpServlet {
             content.showText(footer);
             content.endText();
 
-            // Draw "PAID" seal as light watermark if payment status = "paid"
+            // Draw "PAID" seal as  watermark if payment status = "paid"
             if (order.getPaymentStatus() != null && order.getPaymentStatus().equalsIgnoreCase("paid")) {
                 // Save graphics state
                 content.saveGraphicsState();
@@ -170,11 +170,11 @@ public class GenerateBillServlet extends HttpServlet {
                 // Set transparency to low (e.g., 20%)
                 content.setNonStrokingColor(0.2f);
 
-                // Position watermark roughly center of page, big size
+                // Position watermark roughly center of page,
                 float sealWidth = 200;
                 float sealHeight = 100;
                 float sealX = (pageWidth - sealWidth) / 2;
-             // Place seal just below the order details box (some padding 20)
+             // Place seal just below the order details box 
                 float sealY = boxMarginTop - boxHeight - sealHeight - 20;
 
                 content.drawImage(paidSeal, sealX, sealY, sealWidth, sealHeight);
