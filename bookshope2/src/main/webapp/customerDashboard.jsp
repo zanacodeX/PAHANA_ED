@@ -34,7 +34,26 @@
     <meta charset="UTF-8">
     <title>Customer Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+         
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+            
+     
+    background-image: url("<%= request.getContextPath() %>/image/icon.jpeg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center; 
+         
+       background-filter: brightness(0.4);/* Centers the image */
+    background-attachment: fixed; 
+    background-z-index: -1;
+   
+        
+        
+        }
 
         .navbar {
             background-color: #333;
@@ -91,6 +110,7 @@
         }
 
         .book-card {
+        background-color: #ffffff;
             border: 1px solid #ccc;
             margin: 10px;
             padding: 10px;
@@ -98,6 +118,8 @@
             text-align: center;
             display: inline-block;
         }
+        .book-card:hover {
+            transform: translateY(-5px);}
 
         .book-card img {
             width: 100%;
@@ -120,6 +142,10 @@
             cursor: pointer;
             margin-top: 10px;
         }
+        
+        h2 {
+            
+            color: Yellow;}
 
         .cart-button:hover {
             background-color: #218838;
