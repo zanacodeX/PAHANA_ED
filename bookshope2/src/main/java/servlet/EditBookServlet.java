@@ -57,7 +57,9 @@ public class EditBookServlet extends HttpServlet {
             boolean updated = bookController.updateBook(book);
 
             if (updated) {
-                response.sendRedirect("manageBooks.jsp?message=Book+updated+successfully");
+                request.setAttribute("book", book);
+                request.setAttribute("message", "Book updated successfully!");
+                request.getRequestDispatcher("editBook.jsp").forward(request, response);
             } else {
                 request.setAttribute("book", book);
                 request.setAttribute("error", "Failed to update book");

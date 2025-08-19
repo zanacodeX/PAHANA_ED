@@ -66,8 +66,32 @@
     <label>Units Consumed:</label>
     <input type="number" name="unitsConsumed" value="<%= customer.getUnitsConsumed() %>" required>
 
-    <input type="submit" value="Update">
-    <a href="manageCustomers.jsp" class="button">Cancel</a>
+    <br><br>
+<div style="display:flex; justify-content:space-between; max-width:450px; margin:0 auto;">
+    <button type="submit">Update</button>
+    <button type="button" onclick="window.location.href='manageCustomers.jsp';">Cancel</button>
+    <button type="button" onclick="window.location.href='manageCustomers.jsp';"
+            style="padding:10px 20px; font-size:16px; border-radius:6px; 
+                   background-color:#3498db; color:white; border:none; cursor:pointer;">
+        ⬅ Back
+    </button>
+</div>
+
+    <% if (request.getAttribute("message") != null) { %>
+    <div style="margin:20px auto; padding:10px; max-width:600px;
+                background:#d4edda; color:#155724; border:1px solid #c3e6cb;
+                border-radius:6px; text-align:center;">
+        ✅ <%= request.getAttribute("message") %>
+    </div>
+<% } %>
+
+<% if (request.getAttribute("error") != null) { %>
+    <div style="margin:20px auto; padding:10px; max-width:600px;
+                background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;
+                border-radius:6px; text-align:center;">
+        ❌ <%= request.getAttribute("error") %>
+    </div>
+<% } %>
 </form>
 
 </body>

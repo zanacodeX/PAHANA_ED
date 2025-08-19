@@ -52,7 +52,9 @@ public class EditCustomerServlet extends HttpServlet {
             EditResult result = controller.updateCustomer(customer);
 
             if (result.isSuccess()) {
-                response.sendRedirect("manageCustomers.jsp");
+            	 request.setAttribute("customer", customer);
+            	    request.setAttribute("message", "Customer updated successfully!");
+            	    request.getRequestDispatcher("editCustomer.jsp").forward(request, response);
             } else {
                 request.setAttribute("error", result.getMessage());
                 request.setAttribute("customer", result.getCustomer());

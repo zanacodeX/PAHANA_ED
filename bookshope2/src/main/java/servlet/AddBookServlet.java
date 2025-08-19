@@ -29,7 +29,8 @@ public class AddBookServlet extends HttpServlet {
             BookController.BookResult result = bookController.addBook(name, author, category, price, imageUrl);
 
             if (result.isSuccess()) {
-                response.sendRedirect("manageBooks.jsp");
+            	request.setAttribute("message", "Book added successfully!");
+                request.getRequestDispatcher("addBook.jsp").forward(request, response);
             } else {
                 request.setAttribute("error", result.getMessage());
                 request.getRequestDispatcher("addBook.jsp").forward(request, response);
