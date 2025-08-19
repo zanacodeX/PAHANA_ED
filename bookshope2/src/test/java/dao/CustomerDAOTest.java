@@ -1,148 +1,211 @@
 package dao;
 
+import dto.Customer;
+import model.DBConnection;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+class CustomerDAOTest {
 
-import org.junit.jupiter.api.*;
-import org.mockito.*;
-
-import dto.Customer;
-import model.DBConnection;
-
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CustomerDAOTest {
-
-    @Mock
-    private Connection mockConnection;
-
-    @Mock
-    private PreparedStatement mockPreparedStatement;
-
-    @Mock
-    private ResultSet mockResultSet;
-
-    @InjectMocks
-    private CustomerDAO customerDAO;
+    private CustomerDAO dao;
 
     @BeforeEach
-    public void setup() throws Exception {
-        MockitoAnnotations.openMocks(this);
-
-        // Mock DBConnection.getConnection()
-        mockStatic(DBConnection.class);
-        when(DBConnection.getConnection()).thenReturn(mockConnection);
-
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+    void setUp() {
+        dao = new CustomerDAO();
     }
 
     @Test
-    @Order(1)
-    public void testInsertCustomer() throws Exception {
-        Customer customer = new Customer();
-        customer.setUserId(1);
-        customer.setAccountNumber("ACC100");
-        customer.setName("Test Name");
-        customer.setAddress("Test Address");
-        customer.setPhone("0771234567");
-        customer.setUnitsConsumed(50);
+    void testGetAllCustomers() throws Exception {
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockStatement = mock(PreparedStatement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
 
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        try (MockedStatic<DBConnection> dbMock = mockStatic(DBConnection.class)) {
+            dbMock.when(DBConnection::getConnection).thenReturn(mockConnection);
+            when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
+            when(mockStatement.executeQuery()).thenReturn(mockResultSet);
 
-        assertDoesNotThrow(() -> customerDAO.insertCustomer(customer));
-        verify(mockPreparedStatement, times(1)).executeUpdate();
+            // Simulate 2 customers
+            when(mockResultSet.next()).thenReturn(true, true, false);
+            when(mockResultSet.getInt("customer_id")).thenReturn(1, 2);
+            when(mockResultSet.getInt("user_id")).thenReturn(101, 102);
+            when(mockResultSet.getString("account_number")).thenReturn("ACC001", "ACC002");
+            when(mockResultSet.getString("name")).thenReturn("Alice", "Bob");
+            when(mockResultSet.getString("address")).thenReturn("Street A", "Street B");
+            when(mockResultSet.getString("phone")).thenReturn("111111", "222222");
+            when(mockResultSet.getInt("units_consumed")).thenReturn(10, 20);
+
+            List<Customer> customers = dao.getAllCustomers();
+
+            assertEquals(2, customers.size());
+            assertEquals("Alice", customers.get(0).getName());
+            assertEquals("Bob", customers.get(1).getName());
+        }
     }
 
     @Test
-    @Order(2)
-    public void testGetCustomerById() throws Exception {
-        when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getInt("customer_id")).thenReturn(1);
-        when(mockResultSet.getInt("user_id")).thenReturn(1);
-        when(mockResultSet.getString("name")).thenReturn("Test Name");
-        when(mockResultSet.getString("account_number")).thenReturn("ACC100");
-        when(mockResultSet.getString("address")).thenReturn("Test Address");
-        when(mockResultSet.getString("phone")).thenReturn("0771234567");
-        when(mockResultSet.getInt("units_consumed")).thenReturn(50);
+    void testGetCustomerById() throws Exception {
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockStatement = mock(PreparedStatement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
 
-        Customer c = customerDAO.getCustomerById(1);
-        assertNotNull(c);
-        assertEquals("Test Name", c.getName());
-        assertEquals("ACC100", c.getAccountNumber());
+        try (MockedStatic<DBConnection> dbMock = mockStatic(DBConnection.class)) {
+            dbMock.when(DBConnection::getConnection).thenReturn(mockConnection);
+            when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
+            when(mockStatement.executeQuery()).thenReturn(mockResultSet);
+
+            when(mockResultSet.next()).thenReturn(true);
+            when(mockResultSet.getInt("customer_id")).thenReturn(1);
+            when(mockResultSet.getInt("user_id")).thenReturn(101);
+            when(mockResultSet.getString("account_number")).thenReturn("ACC001");
+            when(mockResultSet.getString("name")).thenReturn("Alice");
+            when(mockResultSet.getString("address")).thenReturn("Street A");
+            when(mockResultSet.getString("phone")).thenReturn("111111");
+            when(mockResultSet.getInt("units_consumed")).thenReturn(10);
+
+            Customer customer = dao.getCustomerById(1);
+
+            assertNotNull(customer);
+            assertEquals("Alice", customer.getName());
+            assertEquals("ACC001", customer.getAccountNumber());
+        }
     }
 
     @Test
-    @Order(3)
-    public void testGetCustomerByUserId() throws Exception {
-        when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getInt("customer_id")).thenReturn(1);
-        when(mockResultSet.getInt("user_id")).thenReturn(1);
-        when(mockResultSet.getString("name")).thenReturn("Test Name");
+    void testInsertCustomer() throws Exception {
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockStatement = mock(PreparedStatement.class);
 
-        Customer c = customerDAO.getCustomerByUserId(1);
-        assertNotNull(c);
-        assertEquals("Test Name", c.getName());
+        try (MockedStatic<DBConnection> dbMock = mockStatic(DBConnection.class)) {
+            dbMock.when(DBConnection::getConnection).thenReturn(mockConnection);
+            when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
+
+            Customer customer = new Customer();
+            customer.setUserId(101);
+            customer.setAccountNumber("ACC001");
+            customer.setName("Alice");
+            customer.setAddress("Street A");
+            customer.setPhone("111111");
+            customer.setUnitsConsumed(10);
+
+            dao.insertCustomer(customer);
+
+            verify(mockStatement).setInt(1, 101);
+            verify(mockStatement).setString(2, "ACC001");
+            verify(mockStatement).setString(3, "Alice");
+            verify(mockStatement).setString(4, "Street A");
+            verify(mockStatement).setString(5, "111111");
+            verify(mockStatement).setInt(6, 10);
+            verify(mockStatement).executeUpdate();
+        }
     }
 
     @Test
-    @Order(4)
-    public void testUpdateCustomer() throws Exception {
-        Customer c = new Customer();
-        c.setCustomerId(1);
-        c.setName("Updated Name");
-        c.setAccountNumber("ACC200");
-        c.setAddress("New Address");
-        c.setPhone("0770000000");
-        c.setUnitsConsumed(100);
+    void testUpdateCustomer() throws Exception {
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockStatement = mock(PreparedStatement.class);
 
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        try (MockedStatic<DBConnection> dbMock = mockStatic(DBConnection.class)) {
+            dbMock.when(DBConnection::getConnection).thenReturn(mockConnection);
+            when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
+            when(mockStatement.executeUpdate()).thenReturn(1);
 
-        assertTrue(customerDAO.updateCustomer(c));
-        verify(mockPreparedStatement, times(1)).executeUpdate();
+            Customer customer = new Customer();
+            customer.setCustomerId(1);
+            customer.setAccountNumber("ACC002");
+            customer.setName("Bob");
+            customer.setAddress("Street B");
+            customer.setPhone("222222");
+            customer.setUnitsConsumed(20);
+
+            boolean result = dao.updateCustomer(customer);
+
+            assertTrue(result);
+            verify(mockStatement).executeUpdate();
+        }
     }
 
     @Test
-    @Order(5)
-    public void testGetAllCustomers() throws Exception {
-        when(mockResultSet.next()).thenReturn(true, true, false); // 2 rows
-        when(mockResultSet.getInt("customer_id")).thenReturn(1, 2);
-        when(mockResultSet.getInt("user_id")).thenReturn(1, 2);
-        when(mockResultSet.getString("name")).thenReturn("Name1", "Name2");
-        when(mockResultSet.getString("account_number")).thenReturn("ACC1", "ACC2");
-        when(mockResultSet.getString("address")).thenReturn("Addr1", "Addr2");
-        when(mockResultSet.getString("phone")).thenReturn("077111", "077222");
-        when(mockResultSet.getInt("units_consumed")).thenReturn(10, 20);
+    void testDeleteCustomerAndUser() throws Exception {
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockGetUserId = mock(PreparedStatement.class);
+        PreparedStatement mockDeleteCustomer = mock(PreparedStatement.class);
+        PreparedStatement mockDeleteUser = mock(PreparedStatement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
 
-        List<Customer> customers = customerDAO.getAllCustomers();
-        assertEquals(2, customers.size());
-        assertEquals("Name1", customers.get(0).getName());
-        assertEquals("Name2", customers.get(1).getName());
+        try (MockedStatic<DBConnection> dbMock = mockStatic(DBConnection.class)) {
+            dbMock.when(DBConnection::getConnection).thenReturn(mockConnection);
+
+            when(mockConnection.prepareStatement(contains("SELECT user_id"))).thenReturn(mockGetUserId);
+            when(mockConnection.prepareStatement(contains("DELETE FROM customers"))).thenReturn(mockDeleteCustomer);
+            when(mockConnection.prepareStatement(contains("DELETE FROM users"))).thenReturn(mockDeleteUser);
+
+            when(mockGetUserId.executeQuery()).thenReturn(mockResultSet);
+            when(mockResultSet.next()).thenReturn(true);
+            when(mockResultSet.getInt("user_id")).thenReturn(101);
+
+            boolean result = dao.deleteCustomerAndUser(1);
+
+            assertTrue(result);
+            verify(mockGetUserId).executeQuery();
+            verify(mockDeleteCustomer).executeUpdate();
+            verify(mockDeleteUser).executeUpdate();
+        }
     }
 
     @Test
-    @Order(6)
-    public void testDeleteCustomerAndUser() throws Exception {
-        when(mockResultSet.next()).thenReturn(true); // Customer exists
-        when(mockResultSet.getInt("user_id")).thenReturn(1);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+    void testGetCustomerByUserId() throws Exception {
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockStatement = mock(PreparedStatement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
 
-        assertDoesNotThrow(() -> {
-            boolean deleted = customerDAO.deleteCustomerAndUser(1);
-            assertTrue(deleted);
-        });
+        try (MockedStatic<DBConnection> dbMock = mockStatic(DBConnection.class)) {
+            dbMock.when(DBConnection::getConnection).thenReturn(mockConnection);
+            when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
+            when(mockStatement.executeQuery()).thenReturn(mockResultSet);
+
+            when(mockResultSet.next()).thenReturn(true);
+            when(mockResultSet.getInt("customer_id")).thenReturn(1);
+            when(mockResultSet.getInt("user_id")).thenReturn(101);
+            when(mockResultSet.getString("account_number")).thenReturn("ACC001");
+            when(mockResultSet.getString("name")).thenReturn("Alice");
+            when(mockResultSet.getString("address")).thenReturn("Street A");
+            when(mockResultSet.getString("phone")).thenReturn("111111");
+
+            Customer customer = dao.getCustomerByUserId(101);
+
+            assertNotNull(customer);
+            assertEquals("Alice", customer.getName());
+            assertEquals(101, customer.getUserId());
+        }
     }
 
     @Test
-    @Order(7)
-    public void testGetCustomerIdByUserId() throws Exception {
-        when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getInt("customer_id")).thenReturn(5);
+    void testGetCustomerIdByUserId() throws Exception {
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockStatement = mock(PreparedStatement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
 
-        int customerId = customerDAO.getCustomerIdByUserId(1);
-        assertEquals(5, customerId);
+        try (MockedStatic<DBConnection> dbMock = mockStatic(DBConnection.class)) {
+            dbMock.when(DBConnection::getConnection).thenReturn(mockConnection);
+            when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
+            when(mockStatement.executeQuery()).thenReturn(mockResultSet);
+
+            when(mockResultSet.next()).thenReturn(true);
+            when(mockResultSet.getInt("customer_id")).thenReturn(1);
+
+            int customerId = dao.getCustomerIdByUserId(101);
+
+            assertEquals(1, customerId);
+        }
     }
 }
