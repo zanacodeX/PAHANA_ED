@@ -122,6 +122,16 @@
         </div>
 
         <input type="submit" value="Login">
+        
+        <!-- ✅ Show error here -->
+    <%
+        String errorMessage = (String) request.getAttribute("errorMessage");
+        if (errorMessage != null) {
+    %>
+        <p style="color:red; text-align:center; margin-top:10px;"><%= errorMessage %></p>
+    <%
+        }
+    %>
 
         <div class="register-link">
             Don't have an account? <a href="register.jsp">Register</a>
