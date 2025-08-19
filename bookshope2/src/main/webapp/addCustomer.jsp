@@ -165,7 +165,23 @@
         <div class="back-button">
     <a href="adminDashboard.jsp" class="back-btn-container">
         <button type="button">Back to Dashboard</button>
+       
     </a>
+    <% if (request.getAttribute("successMessage") != null) { %>
+    <div style="margin:15px auto; padding:10px; max-width:300px;
+                background:#d4edda; color:#155724; border:1px solid #c3e6cb;
+                border-radius:6px; text-align:center;">
+        <%= request.getAttribute("successMessage") %>
+    </div>
+<% } %>
+
+<% if (request.getAttribute("errorMessage") != null) { %>
+    <div style="margin:15px auto; padding:10px; max-width:300px;
+                background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;
+                border-radius:6px; text-align:center;">
+        <%= request.getAttribute("errorMessage") %>
+    </div>
+<% } %>
 </div>
     </form>
 

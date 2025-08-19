@@ -30,11 +30,11 @@ public class AddCustomerServlet extends HttpServlet {
         RegisterResult result = registerController.registerCustomer(email, password, accNum, name, address, phone);
 
         if (result.isSuccess()) {
-        	
-           res.sendRedirect("adminDashboard.jsp");
+            req.setAttribute("successMessage", "✅ Customer added successfully!");
+            req.getRequestDispatcher("addCustomer.jsp").forward(req, res);
         } else {
-            req.setAttribute("errorMessage", result.getMessage());
-            req.getRequestDispatcher("error.jsp").forward(req, res);
+            req.setAttribute("errorMessage", "❌ " + result.getMessage());
+            req.getRequestDispatcher("addCustomer.jsp").forward(req, res);
         }
     }
 }
