@@ -3,6 +3,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+
 <meta charset="UTF-8">
     <title>Add New Book</title>
     <style>
@@ -109,8 +111,24 @@
 
         <input type="submit" value="Add Book">
         
+        <% if (request.getAttribute("message") != null) { %>
+    <div style="margin:20px auto; padding:10px; max-width:600px;
+                background:#d4edda; color:#155724; border:1px solid #c3e6cb;
+                border-radius:6px; text-align:center;">
+        ✅ <%= request.getAttribute("message") %>
+    </div>
+<% } %>
+
+<% if (request.getAttribute("error") != null) { %>
+    <div style="margin:20px auto; padding:10px; max-width:600px;
+                background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;
+                border-radius:6px; text-align:center;">
+        ❌ <%= request.getAttribute("error") %>
+    </div>
+<% } %>
+        
         <div class="back-button">
-    <a href="adminDashboard.jsp" class="back-button">
+    <a href="manageBooks.jsp" class="back-button">
         <button type="button">Back to Dashboard</button>
     </a>
 </div>

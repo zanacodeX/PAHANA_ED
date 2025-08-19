@@ -160,7 +160,7 @@
         <td>
             <form method="post" action="UpdateOrderStatusServlet">
                 <input type="hidden" name="orderId" value="<%= order.getOrderId() %>"/>
-                <button type="submit" name="action" value="confirm" class="action-btn confirm">Confirm</button>
+                <button type="submit" name="action" value="confirm" class="action-btn confirm">Accepted</button>
                 <button type="submit" name="action" value="decline" class="action-btn decline">Decline</button>
             </form>
         </td>
