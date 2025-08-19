@@ -76,6 +76,7 @@
             </div>
 
             <button type="submit" class="submit-button">Confirm Order</button>
+            <button type="button" onclick="window.location.href='customerDashboard.jsp';">Cancel</button>
         </form>
     <% } else { %>
         <p class="error">Invalid book selected. Please go back and try again.</p>
