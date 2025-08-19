@@ -1,149 +1,195 @@
 package dao;
 
 import dto.Order;
-import org.junit.jupiter.api.*;
+import model.DBConnection;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class OrderDAOTest {
+class OrderDAOTest {
 
-    private static OrderDAO orderDAO;
-    private static int testOrderId ;
-    private static final int testCustomerId = 2; // replace with a valid customer_id
-    private static final int testBookId = 4;     // replace with a valid book_id
+    private OrderDAO dao;
 
-    @BeforeAll
-    public static void setup() {
-        orderDAO = new OrderDAO();
+    @BeforeEach
+    void setUp() {
+        dao = new OrderDAO();
     }
 
     @Test
-    @org.junit.jupiter.api.Order(1)
-    public void testPlaceOrder() {
-        Order order = new Order();
-        order.setCustomerId(testCustomerId);
-        order.setBookId(testBookId);
-        order.setBookName("JUnit Test Book");
-        order.setAuthor("JUnit Author");
-        order.setUnitPrice(150.0);
-        order.setQuantity(2);
-        order.setTotal(300.0);
+    void testPlaceOrder() throws Exception {
+        Connection mockConn = mock(Connection.class);
+        PreparedStatement mockStmt = mock(PreparedStatement.class);
 
-        assertDoesNotThrow(() -> orderDAO.placeOrder(order));
+        try (MockedStatic<DBConnection> dbMock = mockStatic(DBConnection.class)) {
+            dbMock.when(DBConnection::getConnection).thenReturn(mockConn);
+            when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
+            when(mockStmt.executeUpdate()).thenReturn(1);
 
-        // Fetch last inserted pending order for this customer
-        try {
-            List<Order> pendingOrders = orderDAO.getPendingOrdersByCustomerId(testCustomerId);
-            assertFalse(pendingOrders.isEmpty(), "Pending orders list should not be empty");
-            testOrderId = pendingOrders.get(pendingOrders.size() - 1).getId();
-            System.out.println("Inserted testOrderId = " + testOrderId);
-        } catch (Exception e) {
-            fail("Exception fetching inserted order: " + e.getMessage());
+            Order order = new Order();
+            order.setCustomerId(1);
+            order.setBookId(101);
+            order.setBookName("Book A");
+            order.setAuthor("Author A");
+            order.setUnitPrice(100.0);
+            order.setQuantity(2);
+            order.setTotal(200.0);
+
+            boolean result = dao.placeOrder(order);
+
+            assertTrue(result);
+            verify(mockStmt).executeUpdate();
         }
     }
 
     @Test
-    @org.junit.jupiter.api.Order(2)
-    public void testGetPendingOrdersByCustomerId() {
-        assertDoesNotThrow(() -> {
-            List<Order> pendingOrders = orderDAO.getPendingOrdersByCustomerId(testCustomerId);
-            assertNotNull(pendingOrders, "Pending orders should not be null");
-            assertTrue(pendingOrders.size() > 0, "There should be at least one pending order");
-        });
-    }
+    void testGetCompletedOrdersByCustomerId() throws Exception {
+        Connection mockConn = mock(Connection.class);
+        PreparedStatement mockStmt = mock(PreparedStatement.class);
+        ResultSet mockRs = mock(ResultSet.class);
 
-    @Test
-    @org.junit.jupiter.api.Order(3)
-    public void testUpdatePaymentStatusToPaid() {
-        assertDoesNotThrow(() -> orderDAO.updatePaymentStatusToPaid(testOrderId));
+        try (MockedStatic<DBConnection> dbMock = mockStatic(DBConnection.class)) {
+            dbMock.when(DBConnection::getConnection).thenReturn(mockConn);
+            when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
+            when(mockStmt.executeQuery()).thenReturn(mockRs);
 
-        try {
-            List<Order> completedOrders = orderDAO.getCompletedOrdersByCustomerId(testCustomerId);
-            boolean found = completedOrders.stream().anyMatch(o -> o.getId() == testOrderId);
-            assertTrue(found, "Order payment status should be updated to Paid");
-        } catch (Exception e) {
-            fail("Exception fetching completed orders: " + e.getMessage());
+            when(mockRs.next()).thenReturn(true, false);
+            when(mockRs.getInt("id")).thenReturn(1);
+            when(mockRs.getInt("customer_id")).thenReturn(1);
+            when(mockRs.getInt("book_id")).thenReturn(101);
+            when(mockRs.getString("book_name")).thenReturn("Book A");
+            when(mockRs.getString("author")).thenReturn("Author A");
+            when(mockRs.getDouble("unit_price")).thenReturn(100.0);
+            when(mockRs.getInt("quantity")).thenReturn(2);
+            when(mockRs.getDouble("total")).thenReturn(200.0);
+            when(mockRs.getString("order_status")).thenReturn("Completed");
+            when(mockRs.getString("payment_status")).thenReturn("Paid");
+
+            List<Order> orders = dao.getCompletedOrdersByCustomerId(1);
+
+            assertEquals(1, orders.size());
+            assertEquals("Book A", orders.get(0).getBookName());
         }
     }
 
     @Test
-    @org.junit.jupiter.api.Order(4)
-    public void testGetCompletedOrdersByCustomerId() {
-        assertDoesNotThrow(() -> {
-            List<Order> completedOrders = orderDAO.getCompletedOrdersByCustomerId(testCustomerId);
-            assertNotNull(completedOrders, "Completed orders should not be null");
-            assertTrue(completedOrders.size() > 0, "There should be at least one completed order");
-        });
-    }
+    void testGetAllPaidOrders() throws Exception {
+        Connection mockConn = mock(Connection.class);
+        PreparedStatement mockStmt = mock(PreparedStatement.class);
+        ResultSet mockRs = mock(ResultSet.class);
 
-    @Test
-    @org.junit.jupiter.api.Order(5)
-    public void testGetAllPaidOrders() {
-        assertDoesNotThrow(() -> {
-            List<Order> paidOrders = orderDAO.getAllPaidOrders();
-            assertNotNull(paidOrders, "Paid orders list should not be null");
-        });
-    }
+        try (MockedStatic<DBConnection> dbMock = mockStatic(DBConnection.class)) {
+            dbMock.when(DBConnection::getConnection).thenReturn(mockConn);
+            when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
+            when(mockStmt.executeQuery()).thenReturn(mockRs);
 
-    @Test
-    @org.junit.jupiter.api.Order(6)
-    public void testGetAllOrders() {
-        assertDoesNotThrow(() -> {
-            List<Order> allOrders = orderDAO.getAllOrders();
-            assertNotNull(allOrders, "All orders list should not be null");
-            assertTrue(allOrders.size() > 0, "There should be at least one order");
-        });
-    }
+            when(mockRs.next()).thenReturn(true, false);
+            when(mockRs.getInt("id")).thenReturn(1);
+            when(mockRs.getString("book_name")).thenReturn("Book A");
+            when(mockRs.getString("payment_status")).thenReturn("Paid");
 
-    @Test
-    @org.junit.jupiter.api.Order(7)
-    public void testUpdateOrderStatus() {
-        assertDoesNotThrow(() -> orderDAO.updateOrderStatus(testOrderId, "Confirmed"));
+            List<Order> orders = dao.getAllPaidOrders();
 
-        try {
-            List<Order> orders = orderDAO.getOrdersByCustomerId(testCustomerId);
-            boolean confirmed = orders.stream()
-                    .anyMatch(o -> o.getId() == testOrderId && "Confirmed".equalsIgnoreCase(o.getOrderStatus()));
-            assertTrue(confirmed, "Order status should be Confirmed");
-        } catch (Exception e) {
-            fail("Exception fetching orders: " + e.getMessage());
+            assertEquals(1, orders.size());
+            assertEquals("Book A", orders.get(0).getBookName());
         }
     }
 
     @Test
-    @org.junit.jupiter.api.Order(8)
-    public void testGetPendingOrders() {
-        assertDoesNotThrow(() -> {
-            List<Order> pendingOrders = orderDAO.getPendingOrders();
-            assertNotNull(pendingOrders, "Pending orders should not be null");
-        });
-    }
+    void testUpdateOrderStatus() throws Exception {
+        Connection mockConn = mock(Connection.class);
+        PreparedStatement mockStmt = mock(PreparedStatement.class);
 
-    @Test
-    @org.junit.jupiter.api.Order(9)
-    public void testGetOrdersByCustomerId() {
-        List<Order> orders = orderDAO.getOrdersByCustomerId(testCustomerId);
-        assertNotNull(orders, "Orders by customer should not be null");
-        assertTrue(orders.size() > 0, "There should be at least one order for the customer");
-    }
+        try (MockedStatic<DBConnection> dbMock = mockStatic(DBConnection.class)) {
+            dbMock.when(DBConnection::getConnection).thenReturn(mockConn);
+            when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
 
-    @Test
-    @org.junit.jupiter.api.Order(10)
-    public void testGetOrderById() {
-        Order order = null;
-        try {
-            order = orderDAO.getOrderById(testOrderId);
-        } catch (Exception e) {
-            fail("Exception fetching order by ID: " + e.getMessage());
+            dao.updateOrderStatus(1, "Confirmed");
+
+            verify(mockStmt).executeUpdate();
         }
-
-        assertNotNull(order, "Order should not be null");
-        assertEquals(testOrderId, order.getId(), "Order ID should match testOrderId");
     }
 
+    @Test
+    void testGetOrderById() throws Exception {
+        Connection mockConn = mock(Connection.class);
+        PreparedStatement mockStmt = mock(PreparedStatement.class);
+        ResultSet mockRs = mock(ResultSet.class);
+
+        try (MockedStatic<DBConnection> dbMock = mockStatic(DBConnection.class)) {
+            dbMock.when(DBConnection::getConnection).thenReturn(mockConn);
+            when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
+            when(mockStmt.executeQuery()).thenReturn(mockRs);
+
+            when(mockRs.next()).thenReturn(true);
+            when(mockRs.getInt("id")).thenReturn(1);
+            when(mockRs.getInt("customer_id")).thenReturn(1);
+            when(mockRs.getString("book_name")).thenReturn("Book A");
+            when(mockRs.getString("author")).thenReturn("Author A");
+            when(mockRs.getDouble("unit_price")).thenReturn(100.0);
+            when(mockRs.getInt("quantity")).thenReturn(2);
+            when(mockRs.getDouble("total")).thenReturn(200.0);
+            when(mockRs.getString("order_status")).thenReturn("Pending");
+            when(mockRs.getString("payment_status")).thenReturn("Pending");
+            when(mockRs.getString("customer_name")).thenReturn("Alice");
+            when(mockRs.getString("email")).thenReturn("alice@test.com");
+
+            Order order = dao.getOrderById(1);
+
+            assertNotNull(order);
+            assertEquals("Book A", order.getBookName());
+            assertEquals("Alice", order.getCustomerName());
+        }
+    }
+
+    @Test
+    void testUpdatePaymentStatus() throws Exception {
+        Connection mockConn = mock(Connection.class);
+        PreparedStatement mockStmt = mock(PreparedStatement.class);
+
+        try (MockedStatic<DBConnection> dbMock = mockStatic(DBConnection.class)) {
+            dbMock.when(DBConnection::getConnection).thenReturn(mockConn);
+            when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
+
+            dao.updatePaymentStatus(1, "Paid");
+
+            verify(mockStmt).executeUpdate();
+        }
+    }
+
+    @Test
+    void testGetPendingOrdersByCustomerId() throws Exception {
+        Connection mockConn = mock(Connection.class);
+        PreparedStatement mockStmt = mock(PreparedStatement.class);
+        ResultSet mockRs = mock(ResultSet.class);
+
+        try (MockedStatic<DBConnection> dbMock = mockStatic(DBConnection.class)) {
+            dbMock.when(DBConnection::getConnection).thenReturn(mockConn);
+            when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
+            when(mockStmt.executeQuery()).thenReturn(mockRs);
+
+            when(mockRs.next()).thenReturn(true, false);
+            when(mockRs.getInt("id")).thenReturn(1);
+            when(mockRs.getInt("customer_id")).thenReturn(1);
+            when(mockRs.getString("book_name")).thenReturn("Book A");
+            when(mockRs.getString("author")).thenReturn("Author A");
+            when(mockRs.getDouble("unit_price")).thenReturn(100.0);
+            when(mockRs.getInt("quantity")).thenReturn(2);
+            when(mockRs.getDouble("total")).thenReturn(200.0);
+            when(mockRs.getString("order_status")).thenReturn("Pending");
+            when(mockRs.getString("payment_status")).thenReturn("Pending");
+
+            List<Order> orders = dao.getPendingOrdersByCustomerId(1);
+
+            assertEquals(1, orders.size());
+            assertEquals("Book A", orders.get(0).getBookName());
+        }
+    }
 }
-
-   

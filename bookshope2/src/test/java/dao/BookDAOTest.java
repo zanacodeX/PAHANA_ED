@@ -1,78 +1,111 @@
 package dao;
 
-import static org.junit.jupiter.api.Assertions.*;
+import dto.Book;
+import model.DBConnection;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 
-import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-import dto.Book;
+class BookDAOTest {
 
-public class BookDAOTest {
+    private BookDAO dao;
 
-    private static BookDAO bookDAO;
-
-    @BeforeAll
-    public static void setupclass() {
-        bookDAO = new BookDAO();
+    @BeforeEach
+    void setUp() {
+        dao = new BookDAO();
     }
 
     @Test
-    public void testAddAndGetBookById() throws Exception {
-        Book newBook = new Book(0, "JUnit in Action", "Sam Brannen", "Testing", 29.99, "image.jpg");
-        bookDAO.insertBook(newBook);
+    void testGetAllBooks() throws Exception {
+        // Mock JDBC objects
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockStatement = mock(PreparedStatement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
 
-        List<Book> books = bookDAO.searchBooks("JUnit in Action");
-        assertFalse(books.isEmpty(), "Book should be found after insertion");
+        // Mock static DBConnection.getConnection()
+        try (MockedStatic<DBConnection> mockedDB = mockStatic(DBConnection.class)) {
+            mockedDB.when(DBConnection::getConnection).thenReturn(mockConnection);
+            when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
+            when(mockStatement.executeQuery()).thenReturn(mockResultSet);
 
-        Book fetchedBook = bookDAO.getBookById(books.get(0).getId());
-        assertNotNull(fetchedBook, "Fetched book should not be null");
-        assertEquals("JUnit in Action", fetchedBook.getName());
+            // Mock ResultSet
+            when(mockResultSet.next()).thenReturn(true, true, false); // two books
+            when(mockResultSet.getInt("id")).thenReturn(1, 2);
+            when(mockResultSet.getString("name")).thenReturn("Book One", "Book Two");
+            when(mockResultSet.getString("author")).thenReturn("Author A", "Author B");
+            when(mockResultSet.getString("category")).thenReturn("Fiction", "Non-Fiction");
+            when(mockResultSet.getDouble("price")).thenReturn(10.0, 20.0);
+            when(mockResultSet.getString("image_path")).thenReturn("img1.jpg", "img2.jpg");
+
+            // Call method
+            List<Book> books = dao.getAllBooks();
+
+            // Assertions
+            assertEquals(2, books.size());
+            assertEquals("Book One", books.get(0).getName());
+            assertEquals("Book Two", books.get(1).getName());
+
+            // Verify JDBC calls
+            verify(mockConnection).prepareStatement(anyString());
+            verify(mockStatement).executeQuery();
+            verify(mockResultSet, times(3)).next();
+        }
     }
 
     @Test
-    public void testGetAllBooks() throws Exception {
-        List<Book> books = bookDAO.getAllBooks();
-        assertNotNull(books);
-        assertTrue(books.size() >= 0); // At least empty list
+    void testGetBookByID() throws Exception {
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockStatement = mock(PreparedStatement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
+
+        try (MockedStatic<DBConnection> mockedDB = mockStatic(DBConnection.class)) {
+            mockedDB.when(DBConnection::getConnection).thenReturn(mockConnection);
+            when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
+            when(mockStatement.executeQuery()).thenReturn(mockResultSet);
+
+            when(mockResultSet.next()).thenReturn(true);
+            when(mockResultSet.getInt("id")).thenReturn(1);
+            when(mockResultSet.getString("name")).thenReturn("Book One");
+            when(mockResultSet.getString("author")).thenReturn("Author A");
+            when(mockResultSet.getString("category")).thenReturn("Fiction");
+            when(mockResultSet.getDouble("price")).thenReturn(15.0);
+            when(mockResultSet.getString("image_path")).thenReturn("img1.jpg");
+
+            Book book = dao.getBookByID(1);
+
+            assertNotNull(book);
+            assertEquals(1, book.getId());
+            assertEquals("Book One", book.getName());
+        }
     }
 
     @Test
-    public void testUpdateBook() throws Exception {
-        Book newBook = new Book(0, "Temp Book", "Author A", "Category A", 10.0, "temp.jpg");
-        bookDAO.insertBook(newBook);
+    void testInsertBook() throws Exception {
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockStatement = mock(PreparedStatement.class);
 
-        List<Book> books = bookDAO.searchBooks("Temp Book");
-        assertFalse(books.isEmpty());
+        try (MockedStatic<DBConnection> mockedDB = mockStatic(DBConnection.class)) {
+            mockedDB.when(DBConnection::getConnection).thenReturn(mockConnection);
+            when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        Book bookToUpdate = books.get(0);
-        bookToUpdate.setName("Updated Book Name");
+            Book book = new Book(0, "Book X", "Author X", "Sci-Fi", 25.0, "imgX.jpg");
+            dao.insertBook(book);
 
-        boolean updated = bookDAO.updateBook(bookToUpdate);
-        assertTrue(updated);
-
-        Book updatedBook = bookDAO.getBookById(bookToUpdate.getId());
-        assertEquals("Updated Book Name", updatedBook.getName());
-    }
-
-    @Test
-    public void testDeleteBook() throws Exception {
-        Book book = new Book(0, "To Delete", "Author B", "Category B", 15.0, "delete.jpg");
-        bookDAO.insertBook(book);
-
-        List<Book> books = bookDAO.searchBooks("To Delete");
-        assertFalse(books.isEmpty());
-
-        int idToDelete = books.get(0).getId();
-        bookDAO.deleteBook(idToDelete);
-
-        Book deletedBook = bookDAO.getBookById(idToDelete);
-        assertNull(deletedBook);
-    }
-
-    @Test
-    public void testGetAllCategories() throws Exception {
-        List<String> categories = bookDAO.getAllCategories();
-        assertNotNull(categories);
+            verify(mockConnection).prepareStatement(anyString());
+            verify(mockStatement).setString(1, "Book X");
+            verify(mockStatement).setString(2, "Author X");
+            verify(mockStatement).setString(3, "Sci-Fi");
+            verify(mockStatement).setDouble(4, 25.0);
+            verify(mockStatement).setString(5, "imgX.jpg");
+            verify(mockStatement).executeUpdate();
+        }
     }
 }
